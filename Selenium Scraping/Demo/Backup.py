@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+import copy
 
 #Section 1: Logging into Zephyr and navigating to the list of all deals
 
@@ -17,6 +18,7 @@ url = "https://cas.cbs.dk/saml/module.php/core/loginuserpass.php?AuthState=_71e0
 #Open Chrome
 driver = webdriver.Chrome()
 driver.get(url)
+driver.maximize_window()
 
 #Logg in using info in "username" and "password"
 driver.find_element_by_name("username").send_keys(username)
@@ -42,15 +44,47 @@ driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSear
 driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody/tr[2]/td[9]/a').click()
 
 
-#Section 2: Entering a single page, allowing for a script to execute and exiting
-#driver.execute_script("window.scrollTo(0, 500);")
+#Section 2: Define the functions
+
+#while on a deal page, this function changes the index page to the next one
+def change_index_page3(page_index_we):
+    while True:
+        time.sleep(2)
+        page_index_v = page_index_we.get_attribute("value")
+        page_index_copy = int(copy.copy(page_index_v))
+        page_index_copy_b = int(page_index_copy) + 1
+        driver.find_element_by_xpath('//*[@id="SeqNrlbl"]').clear()
+        driver.find_element_by_xpath('//*[@id="SeqNrlbl"]').send_keys(page_index_copy_b)
+        driver.find_element_by_xpath('//*[@id="SeqNrlbl"]').send_keys(Keys.ENTER)
+        return starter1()
+
+#checks if the deal status equals "Completed". If yes: run the scraper. If not: run the change_index_page
+def navigator_bot2(page_index):
+    deal_status = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[2]/td[3]')
+    if deal_status.text != "Completed":
+        change_index_page3(page_index_we)
+    else:
+        web_scraper()
+
+def starter1():
+    while page_index_v < 2054977:
+        navigator_bot(page_index)
+
+
+# page_scraper(sub_list, master_list)
+##Takes a sub list and a master list. The sublist is cleared and then filled with variables which then is appended to the master list, containing all the deals.
+def web_scraper():
+    sub_list = []
+
+master_list = []
+
+
+
 elems = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_FixedContent_Section_TITLE_DealTitle"]/tbody/tr[2]/td[2]')
 print(elems.text)
 
 elems2 = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[3]/a')
 print(elems2.text)
-
-
 
 time.sleep(10)
 driver.close()
