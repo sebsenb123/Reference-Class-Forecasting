@@ -44,9 +44,11 @@ driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSear
 driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody/tr[2]/td[9]/a').click()
 
 
+
 #Section 2: Define the functions
 
 #while on a deal page, this function changes the index page to the next one
+
 def change_index_page3(page_index_we):
     while True:
         time.sleep(2)
@@ -64,27 +66,126 @@ def navigator_bot2(page_index):
     if deal_status.text != "Completed":
         change_index_page3(page_index_we)
     else:
-        web_scraper()
+        scraper()
 
 def starter1():
-    while page_index_v < 2054977:
-        navigator_bot(page_index)
+    while current_page_index < 2054977:
+        navigator_bot2(page_index)
 
 
 # page_scraper(sub_list, master_list)
 ##Takes a sub list and a master list. The sublist is cleared and then filled with variables which then is appended to the master list, containing all the deals.
-def web_scraper():
+def scraper(master_list):
     sub_list = []
 
+    deal_type = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[1]/td[3]')
+    deal_status = driver.find_element_by_xpathdriver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[2]/td[3]')
+    deal_value = driver.find_element_by_xpath.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[3]/td[3]')
+    completed_date = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_STRUCTURESDATES_MainStructuresDates"]/tbody/tr/td[2]/table/tbody/tr[4]/td[3]')
+
+    acquiror_name = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[7]/td/table/tbody/tr/td[3]/a')
+    acquiror_country = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[7]/td/table/tbody/tr/td[4]')
+    # acquired_stake = driver.find_element_by_xpath
+
+    target_name = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[4]/a')
+    target_country = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[5]')
+    # target_enterprise_value = driver.find_element_by_xpath
+
+    # SCROLL
+
+    pd_target_operating_revenue = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_PREDEALFINANCIALS_SSCtr"]/tbody/tr[8]/td[2]/span')
+    pd_target_EBITDA = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_PREDEALFINANCIALS_SSCtr"]/tbody/tr[9]/td[2]/span')
+    # target_business_desc = driver.find_element_by_xpath
+    # target_trade_desc = driver.find_element_by_xpath
+
+    target_activity = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[6]/table/tbody/tr[1]')
+    target_bvd_sector_desc = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[7]')
+    # target_primary_business_desc = driver.find_element_by_xpath
+
+    sub_list.append(deal_type.text)
+    sub_list.append(deal_status.text)
+    sub_list.append(deal_value.text)
+
+    sub_list.append(completed_date.text)
+    sub_list.append(acquiror_name.text)
+    sub_list.append(acquiror_country.text)
+
+    sub_list.append(target_name.text)
+    sub_list.append(target_country.text)
+    sub_list.append(pd_target_operating_revenue.text)
+    sub_list.append(pd_target_EBITDA.text)
+    sub_list.append(target_activity.text)
+    sub_list.append(target_bvd_sector_desc.text)
+
+
+current_page_index_we = driver.find_element_by_xpath('//*[@id="SeqNrlbl"]')
+current_page_index = current_page_index_we.get_attribute("value")
 master_list = []
 
+#testing below here:
+
+current_page_index_we = driver.find_element_by_xpath('//*[@id="SeqNrlbl"]')
+current_page_index = current_page_index_we.get_attribute("value")
+
+time.sleep(2)
+page_index_copy = int(copy.copy(current_page_index))
+page_index_copy_b = page_index_copy + 3
+driver.find_element_by_xpath('//*[@id="SeqNrlbl"]').clear()
+driver.find_element_by_xpath('//*[@id="SeqNrlbl"]').send_keys(page_index_copy_b)
+driver.find_element_by_xpath('//*[@id="SeqNrlbl"]').send_keys(Keys.ENTER)
+
+time.sleep(2)
+
+sub_list = []
+
+deal_type = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[1]/td[3]')
+deal_status = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[2]/td[3]')
+deal_value = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[3]/td[3]')
+completed_date = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_STRUCTURESDATES_MainStructuresDates"]/tbody/tr/td[2]/table/tbody/tr[4]/td[3]')
+
+acquiror_name = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_PREDEALFINANCIALS_SSCtr"]/tbody/tr[2]/td')
+acquiror_country = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[7]/td/table/tbody/tr/td[4]')
+    # acquired_stake = driver.find_element_by_xpath
+
+#target_name = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[3]/a')
+target_country = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[4]')
+    # target_enterprise_value = driver.find_element_by_xpath
+
+driver.execute_script("document.body.style.zoom='33%'")
+
+pd_target_operating_revenue = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_PREDEALFINANCIALS_SSCtr"]/tbody/tr[5]/td[2]')
+
+pd_target_EBITDA = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_PREDEALFINANCIALS_SSCtr"]/tbody/tr[6]/td[2]')
+    # target_business_desc = driver.find_element_by_xpath
+    # target_trade_desc = driver.find_element_by_xpath
+
+target_activity = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[6]/table/tbody/tr[1]')
+target_bvd_sector_desc = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[7]')
+    # target_primary_business_desc = driver.find_element_by_xpath
+
+time.sleep(2)
+
+sub_list.append(deal_type.text)
+sub_list.append(deal_status.text)
+sub_list.append(deal_value.text)
+
+sub_list.append(completed_date.text)
+sub_list.append(acquiror_name.text)
+sub_list.append(acquiror_country.text)
+
+#sub_list.append(target_name.text)
+sub_list.append(target_country.text)
+sub_list.append(pd_target_operating_revenue.text)
+sub_list.append(pd_target_EBITDA.text)
+sub_list.append(target_activity.text)
+sub_list.append(target_bvd_sector_desc.text)
+
+print(sub_list)
+
+master_list.append(sub_list)
+print(master_list)
 
 
-elems = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_FixedContent_Section_TITLE_DealTitle"]/tbody/tr[2]/td[2]')
-print(elems.text)
-
-elems2 = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[3]/a')
-print(elems2.text)
 
 time.sleep(10)
 driver.close()
