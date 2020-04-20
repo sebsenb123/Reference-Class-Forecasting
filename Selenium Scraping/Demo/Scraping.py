@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import copy
+import pandas as pd
 
 #Section 1: Logging into Zephyr and navigating to the list of all deals
 
@@ -56,6 +57,7 @@ driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_FINANCIALS*DEAL_FINANCIALS
 driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_FINANCIALS*DEAL_FINANCIALS.TITLE02*U"]/a').click()
 driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_FINANCIALS*DEAL_FINANCIALS.TITLE04*U"]/a').click()
 driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_FINANCIALS.TGTURN*U"]/a/span').click()
+time.sleep(3)
 driver.switch_to_frame(driver.find_element_by_xpath('//*[@id="frameFormatOptionDialog"]'))
 driver.find_element_by_xpath('//*[@id="ctl00_OptionSubViews_TYearlyInterimFinancialSelection_ctl00_0"]')
 driver.find_element_by_xpath('//*[@id="ctl00_OptionSubViews_TYearlyInterimFinancialSelection_ctl00_0"]')
@@ -77,87 +79,143 @@ driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_SaveForma
 
 #Section 2: Define the functions
 
+#the master list will be converted into a DataFrame at a later stage
+master_list = []
+
 #while on a deal page, this function changes the index page to the next one
 #change this to work on the list page
-def change_index_page3(page_index_we):
-    while True:
-        time.sleep(2)
-        page_index_v = page_index_we.get_attribute("value")
-        page_index_copy = int(copy.copy(page_index_v))
-        new_page_index = int(page_index_copy) + 1
-        driver.find_element_by_xpath('//*[@id="SeqNrlbl"]').clear()
-        driver.find_element_by_xpath('//*[@id="SeqNrlbl"]').send_keys(new_page_index)
-        driver.find_element_by_xpath('//*[@id="SeqNrlbl"]').send_keys(Keys.ENTER)
-        return starter1()
-
-#checks if the deal status equals "Completed". If yes: run the scraper. If not: run the change_index_page
-#this will probably not be needed
-def navigator_bot2(page_index):
-    deal_status = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[2]/td[3]')
-    if deal_status.text != "Completed":
-        change_index_page3(page_index_we)
-    else:
-        scraper()
-
-def starter1():
-    while current_page_index < 2054977:
-        navigator_bot2(page_index)
-
+def change_index_page3(page_index_we, new_page_index, master_list):
+    driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_NextPage"]').click()
+    time.sleep(5)
+    return scraper(master_list)
 
 # page_scraper(sub_list, master_list)
 ##Takes a sub list and a master list. The sublist is cleared and then filled with variables which then is appended to the master list, containing all the deals.
 def scraper(master_list):
-    sub_list = []
 
-    deal_type = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[1]/td[3]')
-    deal_status = driver.find_element_by_xpathdriver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[2]/td[3]')
-    deal_value = driver.find_element_by_xpath.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[3]/td[3]')
-    completed_date = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_STRUCTURESDATES_MainStructuresDates"]/tbody/tr/td[2]/table/tbody/tr[4]/td[3]')
+    list_row = 1
 
-    acquiror_name = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[7]/td/table/tbody/tr/td[3]/a')
-    acquiror_country = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[7]/td/table/tbody/tr/td[4]')
-    # acquired_stake = driver.find_element_by_xpath
+    deal_number_var = "2"
+    deal_type_var = "2"
+    deal_status_var = "2"
+    deal_value_var = "2"
+    completed_date_var = "2"
+    acquiror_name_var = "2"
+    acquiror_country_var = "2"
+    target_name_var = "2"
+    target_country_var = "2"
+    pd_target_operating_revenue_var = "2"
+    pd_target_EBITDA_var = "2"
+    target_activity_var = "2"
 
-    target_name = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[4]/a')
-    target_country = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[5]')
-    # target_enterprise_value = driver.find_element_by_xpath
+    number_of_deals_on_page = 0
+    table_element = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody')
+    for tr in table_element.find_elements_by_tag_name("tr"):
+        number_of_deals_on_page = number_of_deals_on_page + 1
+    number_of_deals_on_page = number_of_deals_on_page - 2
 
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    while list_row < number_of_deals_on_page:
+        driver.execute_script("document.body.style.zoom='50%'")
+        sub_list = []
 
-    pd_target_operating_revenue = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_PREDEALFINANCIALS_SSCtr"]/tbody/tr[8]/td[2]/span')
-    pd_target_EBITDA = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_PREDEALFINANCIALS_SSCtr"]/tbody/tr[9]/td[2]/span')
-    # target_business_desc = driver.find_element_by_xpath
-    # target_trade_desc = driver.find_element_by_xpath
+        xpath_deal_number = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody/tr[' + deal_number_var + ']/td[1]'
+        deal_number = driver.find_element_by_xpath(xpath_deal_number)
+        deal_number_var2 = int(deal_number_var) + 1
+        deal_number_var = str(copy.copy(deal_number_var2))
+        sub_list.append(deal_number.text)
 
-    target_activity = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[6]/table/tbody/tr[1]')
-    target_bvd_sector_desc = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_Section_OVERVIEW_MainOverview"]/tbody/tr/td/table/tbody/tr[4]/td/table/tbody/tr/td[7]')
-    # target_primary_business_desc = driver.find_element_by_xpath
+        xpath_deal_type = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + deal_type_var + ']/td[9]'
+        deal_type = driver.find_element_by_xpath(xpath_deal_type)
+        deal_type_var2 = int(deal_type_var) + 1
+        deal_type_var = str(copy.copy(deal_type_var2))
+        sub_list.append(deal_type.text)
 
-    sub_list.append(deal_type.text)
-    sub_list.append(deal_status.text)
-    sub_list.append(deal_value.text)
+        xpath_deal_status = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + deal_status_var + ']/td[11]'
+        deal_status = driver.find_element_by_xpath(xpath_deal_status)
+        deal_status_var2 = int(deal_status_var) + 1
+        deal_status_var = str(copy.copy(deal_status_var2))
+        sub_list.append(deal_status.text)
 
-    sub_list.append(completed_date.text)
-    sub_list.append(acquiror_name.text)
-    sub_list.append(acquiror_country.text)
+        xpath_deal_value = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + deal_value_var + ']/td[13]'
+        deal_value = driver.find_element_by_xpath(xpath_deal_value)
+        deal_value_var2 = int(deal_value_var) + 1
+        deal_value_var = str(copy.copy(deal_value_var2))
+        sub_list.append(deal_value.text)
 
-    sub_list.append(target_name.text)
-    sub_list.append(target_country.text)
-    sub_list.append(pd_target_operating_revenue.text)
-    sub_list.append(pd_target_EBITDA.text)
-    sub_list.append(target_activity.text)
-    sub_list.append(target_bvd_sector_desc.text)
+        xpath_completed_date = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr['+completed_date_var+']/td[23]'
+        completed_date = driver.find_element_by_xpath(xpath_completed_date)
+        completed_date_var2 = int(completed_date_var) + 1
+        completed_date_var = str(copy.copy(completed_date_var2))
+        sub_list.append(completed_date.text)
 
+        xpath_acquiror_name = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + acquiror_name_var + ']/td[1]'
+        acquiror_name = driver.find_element_by_xpath(xpath_acquiror_name)
+        acquiror_name_var2 = int(acquiror_name_var) + 1
+        acquiror_name_var = str(copy.copy(acquiror_name_var2))
+        sub_list.append(acquiror_name.text)
 
-current_page_index_we = driver.find_element_by_xpath('//*[@id="SeqNrlbl"]')
-current_page_index = current_page_index_we.get_attribute("value")
-page_index_we = current_page_index
-master_list = []
+        xpath_acquiror_country = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + acquiror_country_var + ']/td[3]'
+        acquiror_country = driver.find_element_by_xpath(xpath_acquiror_country)
+        acquiror_country_var2 = int(acquiror_country_var) + 1
+        acquiror_country_var = str(copy.copy(acquiror_country_var2))
+        sub_list.append(acquiror_country.text)
 
+        xpath_target_name = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + target_name_var + ']/td[5]'
+        target_name = driver.find_element_by_xpath(xpath_target_name)
+        target_name_var2 = int(target_name_var) + 1
+        target_name_var = str(copy.copy(target_name_var2))
+        sub_list.append(target_name.text)
 
-elems = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_FixedContent_Section_TITLE_DealTitle"]/tbody/tr[2]/td[2]')
-print(elems.text)
+        xpath_target_country = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + target_country_var + ']/td[7]'
+        target_country = driver.find_element_by_xpath(xpath_target_country)
+        target_country_var2 = int(target_country_var) + 1
+        target_country_var = str(copy.copy(target_country_var2))
+        sub_list.append(target_country.text)
 
-time.sleep(10)
-driver.close()
-print("Done")
+        xpath_pd_target_operating_revenue = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + pd_target_operating_revenue_var + ']/td[17]'
+        pd_target_operating_revenue = driver.find_element_by_xpath(xpath_pd_target_operating_revenue)
+        pd_target_operating_revenue_var2 = int(pd_target_operating_revenue_var) + 1
+        pd_target_operating_revenue_var = str(copy.copy(pd_target_operating_revenue_var2))
+        sub_list.append(pd_target_operating_revenue.text)
+
+        xpath_pd_target_EBITDA = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + pd_target_EBITDA_var + ']/td[19]'
+        pd_target_EBITDA = driver.find_element_by_xpath(xpath_pd_target_EBITDA)
+        pd_target_EBITDA_var2 = int(pd_target_EBITDA_var) + 1
+        pd_target_EBITDA_var = str(copy.copy(pd_target_EBITDA_var2))
+        sub_list.append(pd_target_EBITDA.text)
+
+        xpath_target_activity = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + target_activity_var + ']/td[21]'
+        target_activity = driver.find_element_by_xpath(xpath_target_activity)
+        target_activity_var2 = int(target_activity_var) + 1
+        target_activity_var = str(copy.copy(target_activity_var2))
+        sub_list.append(target_activity.text)
+
+        # acquired_stake = driver.find_element_by_xpath
+
+        # target_enterprise_value = driver.find_element_by_xpath
+        # target_business_desc = driver.find_element_by_xpath
+        # target_trade_desc = driver.find_element_by_xpath
+        # target_bvd_sector_desc = driver.find_element_by_xpath
+        # target_primary_business_desc = driver.find_element_by_xpath
+
+        master_list.append(sub_list)
+        list_row = list_row + 1
+
+    page_index_we = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_CurrentPage"]')
+    page_index_value = page_index_we.get_attribute("value")
+    page_index_copy = int(copy.copy(page_index_value))
+    new_page_index = int(page_index_copy) + 1
+    # 82222
+    if int(page_index_value) < 2:
+        change_index_page3(page_index_we, new_page_index, master_list)
+    else: finish(master_list)
+
+def finish(master_list):
+    print(master_list)
+    df_master_list = pd.DataFrame(master_list)
+    print(df_master_list)
+    print("Done")
+
+scraper(master_list)
+
+time.sleep(30)
