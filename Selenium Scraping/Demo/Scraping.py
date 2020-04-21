@@ -88,7 +88,7 @@ def change_index_page3(page_index_we, new_page_index, master_list):
     page_index_we = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_CurrentPage"]')
     time.sleep(2)
     driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_NextPage"]').click()
-    time.sleep(10)
+    time.sleep(3)
     return scraper(master_list)
 
 # page_scraper(sub_list, master_list)
@@ -114,10 +114,9 @@ def scraper(master_list):
     table_element = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody')
     for tr in table_element.find_elements_by_tag_name("tr"):
         number_of_deals_on_page = number_of_deals_on_page + 1
-    number_of_deals_on_page = number_of_deals_on_page - 2
+    number_of_deals_on_page = number_of_deals_on_page - 1
 
     while list_row < number_of_deals_on_page:
-        #driver.execute_script("document.body.style.zoom='50%'")
         sub_list = []
         print(list_row)
 
@@ -210,15 +209,14 @@ def scraper(master_list):
     new_page_index = int(page_index_copy) + 1
     number_of_pages = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_PagesLabel"]').text[-5:]
     #here "int(number_of_pages)" should be used
-    if int(page_index_value) < 2:
+    if int(page_index_value) < 5:
         change_index_page3(page_index_we, new_page_index, master_list)
     else: finish(master_list)
 
 def finish(master_list):
     print(master_list)
     df_master_list = pd.DataFrame(master_list)
-
-    print(df_master_list)
+    df_master_list.to_csv('C:/Users/edwar/Desktop/MasterList DataFrame.csv', index=False, sep=',')
     print("Done")
 
 scraper(master_list)
