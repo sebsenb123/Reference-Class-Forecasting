@@ -47,6 +47,9 @@ for tr in table_element.find_elements_by_tag_name("tr"):
     number_of_deals_on_page = number_of_deals_on_page + 1
 print(number_of_deals_on_page)
 
+number_of_pages = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_PagesLabel"]').text[-5:]
+print(number_of_pages)
+
 page_index_we = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_CurrentPage"]')
 time.sleep(2)
 driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_NextPage"]').click()

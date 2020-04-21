@@ -85,8 +85,10 @@ master_list = []
 #while on a deal page, this function changes the index page to the next one
 #change this to work on the list page
 def change_index_page3(page_index_we, new_page_index, master_list):
+    page_index_we = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_CurrentPage"]')
+    time.sleep(2)
     driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_NextPage"]').click()
-    time.sleep(5)
+    time.sleep(10)
     return scraper(master_list)
 
 # page_scraper(sub_list, master_list)
@@ -115,8 +117,9 @@ def scraper(master_list):
     number_of_deals_on_page = number_of_deals_on_page - 2
 
     while list_row < number_of_deals_on_page:
-        driver.execute_script("document.body.style.zoom='50%'")
+        #driver.execute_script("document.body.style.zoom='50%'")
         sub_list = []
+        print(list_row)
 
         xpath_deal_number = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody/tr[' + deal_number_var + ']/td[1]'
         deal_number = driver.find_element_by_xpath(xpath_deal_number)
@@ -205,7 +208,8 @@ def scraper(master_list):
     page_index_value = page_index_we.get_attribute("value")
     page_index_copy = int(copy.copy(page_index_value))
     new_page_index = int(page_index_copy) + 1
-    # 82222
+    number_of_pages = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_PagesLabel"]').text[-5:]
+    #here "int(number_of_pages)" should be used
     if int(page_index_value) < 2:
         change_index_page3(page_index_we, new_page_index, master_list)
     else: finish(master_list)
@@ -213,6 +217,7 @@ def scraper(master_list):
 def finish(master_list):
     print(master_list)
     df_master_list = pd.DataFrame(master_list)
+
     print(df_master_list)
     print("Done")
 
