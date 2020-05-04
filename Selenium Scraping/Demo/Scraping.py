@@ -20,6 +20,7 @@ url = "https://cas.cbs.dk/saml/module.php/core/loginuserpass.php?AuthState=_71e0
 driver = webdriver.Chrome()
 driver.get(url)
 driver.maximize_window()
+time.sleep(3)
 
 #Logg in using info in "username" and "password"
 driver.find_element_by_name("username").send_keys(username)
@@ -35,10 +36,16 @@ driver.find_element_by_id("ContentContainer1_ctl00_Content_VersionSelection1_GoZ
 
 #Open the dropdown menu by hovering and click the "All deals"-button that appears, then get list
 #Really struggled here
-element_to_hover_over = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl02_SearchSearchMenu_Menu2"]/li[13]')
+element_to_hover_over = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl02_SearchSearchMenu_Menu1"]/li[4]/span')
 hover = ActionChains(driver).move_to_element(element_to_hover_over)
 hover.perform()
-all_deals_button = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl02_SearchSearchMenu_Menu2"]/li[13]/ul/li[1]').click()
+listed_unlisted_delisted_button = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl02_SearchSearchMenu_Menu1"]/li[4]/ul/li[2]/span').click()
+#click the "Listed" and "Unlisted" boxes
+driver.find_element_by_xpath('//*[@id="MasterContent_ctl00_Content_ListedUnlistedCtl_CheckBoxListControlForAcquiror_Input_Quoted"]').click()
+driver.find_element_by_xpath('//*[@id="MasterContent_ctl00_Content_ListedUnlistedCtl_CheckBoxListControlForAcquiror_Input_DeListed"]').click()
+#click ok
+driver.find_element_by_xpath('//*[@id="MasterContent_ctl00_Content_Ok"]').click()
+#search list
 driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl05_GoToList"]').click()
 
 #edit search options
@@ -216,6 +223,7 @@ def scraper(master_list):
 def finish(master_list):
     print(master_list)
     df_master_list = pd.DataFrame(master_list)
+    print(df_master_list)
     df_master_list.to_csv('C:/Users/edwar/Desktop/MasterList DataFrame.csv', index=False, sep=',')
     print("Done")
 
