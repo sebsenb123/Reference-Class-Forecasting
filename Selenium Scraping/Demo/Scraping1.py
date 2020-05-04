@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import copy
 import pandas as pd
+import timeit
 
 #Section 1: Logging into Zephyr and navigating to the list of all deals
 
@@ -88,6 +89,9 @@ driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_SaveForma
 
 #the master list will be converted into a DataFrame at a later stage
 master_list = []
+
+#timer for meauring approximate time to scrape
+timer_start = time.time()
 
 #while on a deal page, this function changes the index page to the next one
 #change this to work on the list page
@@ -224,6 +228,8 @@ def finish(master_list):
     print(master_list)
     df_master_list = pd.DataFrame(master_list)
     print(df_master_list)
+    timer_end = time.time()
+    print(timer_end - timer_start)
     df_master_list.to_csv('C:/Users/edwar/Desktop/MasterList DataFrame.csv', index=False, sep=',')
     print("Done")
 
