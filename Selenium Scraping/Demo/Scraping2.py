@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import copy
 import pandas as pd
+import timeit
 
 #Section 1: Logging into Zephyr and navigating to the list of all deals
 
@@ -78,10 +79,22 @@ driver.find_element_by_xpath('//*[@id="TreeView1#GROUPDEALOVERVIEW"]/a').click()
 #deal structure and dates
 driver.find_element_by_xpath('//*[@id="TreeView1#GROUPDEALSTRUCTANDDATES"]/a').click()
 driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_STRUCTURE_AND_DATES.COMPLETION_DATE*U"]/a/span').click()
+#click "company"
+driver.find_element_by_xpath('//*[@id="tab_Company"]').click()
+time.sleep(5)
+driver.find_element_by_xpath('//*[@id="GROUPCOMPANYFINANCIAL_NodeImg"]').click()
+driver.find_element_by_xpath('//*[@id="COMPANY_FINANCIAL_ITEM*COMPANY_FINANCIAL_ITEM.TITLE02*U_NodeImg"]').click()
+
+driver.find_element_by_xpath('//*[@id="TreeView1#COMPANY_FINANCIAL_ITEM.BDNETPROFIT*U"]/img').click()
+driver.switch_to_frame(driver.find_element_by_xpath('//*[@id="frameFormatOptionDialog"]'))
+time.sleep(3)
+driver.find_element_by_xpath('//*[@id="ctl00_OptionFooterSubView_OkButton"]').click()
+
+driver.find_element_by_xpath('//*[@id="TreeView1#COMPANY_FINANCIAL_ITEM.BDDLENVALUE*U"]/img').click()
+#driver.switch_to_frame(driver.find_element_by_xpath('//*[@id="frameFormatOptionDialog"]'))
+
 #ok
 driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_SaveFormat_OkButton"]').click()
-#driver.find_element_by_xpath().click()
-
 
 
 #Section 2: Define the functions
