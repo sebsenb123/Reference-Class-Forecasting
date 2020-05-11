@@ -132,6 +132,8 @@ def scraper(master_list):
     pd_target_operating_revenue_var = "2"
     pd_target_EBITDA_var = "2"
     target_activity_var = "2"
+    acquiror_net_profit_var = "2"
+    acquiror_enterprise_value_var = "2"
 
     number_of_deals_on_page = 0
     table_element = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody')
@@ -215,8 +217,19 @@ def scraper(master_list):
         target_activity_var = str(copy.copy(target_activity_var2))
         sub_list.append(target_activity.text)
 
-        # acquired_stake = driver.find_element_by_xpath
+        xpath_acquiror_net_profit = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + acquiror_net_profit_var + ']/td[25]'
+        acquiror_net_profit = driver.find_element_by_xpath(xpath_acquiror_net_profit)
+        acquiror_net_profit_var2 = int(acquiror_net_profit_var) + 1
+        acquiror_net_profit_var = str(copy.copy(acquiror_net_profit_var2))
+        sub_list.append(acquiror_net_profit.text)
 
+        xpath_acquiror_enterprise_value = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + acquiror_enterprise_value_var + ']/td[27]'
+        acquiror_enterprise_value = driver.find_element_by_xpath(xpath_acquiror_enterprise_value)
+        acquiror_enterprise_value_var2 = int(acquiror_enterprise_value_var) + 1
+        acquiror_enterprise_value_var = str(copy.copy(acquiror_enterprise_value_var2))
+        sub_list.append(acquiror_enterprise_value.text)
+
+        # acquired_stake = driver.find_element_by_xpath
         # target_enterprise_value = driver.find_element_by_xpath
         # target_business_desc = driver.find_element_by_xpath
         # target_trade_desc = driver.find_element_by_xpath
@@ -224,6 +237,8 @@ def scraper(master_list):
         # target_primary_business_desc = driver.find_element_by_xpath
 
         master_list.append(sub_list)
+        df_master_list = pd.DataFrame(master_list)
+        df_master_list.to_csv('C:/Users/edwar/Desktop/MasterList DataFrame Not Final.csv', index=False, sep=',')
         list_row = list_row + 1
 
     page_index_we = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_CurrentPage"]')
@@ -232,7 +247,7 @@ def scraper(master_list):
     new_page_index = int(page_index_copy) + 1
     number_of_pages = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_PagesLabel"]').text[-5:]
     #here "int(number_of_pages)" should be used
-    if int(page_index_value) < 5:
+    if int(page_index_value) < 2:
         change_index_page3(page_index_we, new_page_index, master_list)
     else: finish(master_list)
 
@@ -242,7 +257,7 @@ def finish(master_list):
     print(df_master_list)
     timer_end = time.time()
     print(timer_end - timer_start)
-    df_master_list.to_csv('C:/Users/edwar/Desktop/MasterList DataFrame.csv', index=False, sep=',')
+    df_master_list.to_csv('C:/Users/edwar/Desktop/MasterList DataFrame Final.csv', index=False, sep=',')
     print("Done")
 
 scraper(master_list)
