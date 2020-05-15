@@ -17,7 +17,7 @@ password = input("Insert password: ")
 url = "https://cas.cbs.dk/saml/module.php/core/loginuserpass.php?AuthState=_71e08cea1ce750476fbcf2b3deee8e1adb63e42ece%3Ahttps%3A%2F%2Fcas.cbs.dk%2Fsaml%2Fsaml2%2Fidp%2FSSOService.php%3Fspentityid%3Dhttps%253A%252F%252Fcas.cbs.dk%252Fsaml%252Fmodule.php%252Fsaml%252Fsp%252Fmetadata.php%252Fsaml2%26RelayState%3Dhttps%253A%252F%252Fcas.cbs.dk%252Fsaml%252Fmodule.php%252Fcasserver%252Fcas.php%252Flogin%253Fservice%253Dhttps%25253A%25252F%25252Flogin.esc-web.lib.cbs.dk%25253A8443%25252Flogin%25253Fqurl%25253Dezp.2aHR0cHM6Ly96ZXBoeXIuYnZkaW5mby5jb20vaG9tZS5zZXJ2P3Byb2R1Y3Q9emVwaHlybmVvJmxvZ2luZnJvbWNvbnRleHQ9aXBhZGRyZXNz%26cookieTime%3D1586890197"
 
 #Open Chrome
-driver = webdriver.Chrome()
+driver = webdriver.Chrome('/Users/kazba1/Downloads/chromedriver')
 driver.get(url)
 driver.maximize_window()
 
@@ -210,15 +210,13 @@ def scraper(master_list):
     new_page_index = int(page_index_copy) + 1
     number_of_pages = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_PagesLabel"]').text[-5:]
     #here "int(number_of_pages)" should be used
-    if int(page_index_value) < 2:
+    if int(page_index_value) < 200:
         change_index_page3(page_index_we, new_page_index, master_list)
     else: finish(master_list)
 
 def finish(master_list):
-    print(master_list)
     df_master_list = pd.DataFrame(master_list)
-
-    print(df_master_list)
+    df_master_list.to_csv(r'/Users/kazba1/Desktop/Reference-Class-Forecasting/Master_list_200.csv', index = False)
     print("Done")
 
 scraper(master_list)
