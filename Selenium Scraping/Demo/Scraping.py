@@ -7,7 +7,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import copy
 import pandas as pd
-import timeit
 
 #Section 1: Logging into Zephyr and navigating to the list of all deals
 
@@ -18,10 +17,9 @@ password = input("Insert password: ")
 url = "https://cas.cbs.dk/saml/module.php/core/loginuserpass.php?AuthState=_71e08cea1ce750476fbcf2b3deee8e1adb63e42ece%3Ahttps%3A%2F%2Fcas.cbs.dk%2Fsaml%2Fsaml2%2Fidp%2FSSOService.php%3Fspentityid%3Dhttps%253A%252F%252Fcas.cbs.dk%252Fsaml%252Fmodule.php%252Fsaml%252Fsp%252Fmetadata.php%252Fsaml2%26RelayState%3Dhttps%253A%252F%252Fcas.cbs.dk%252Fsaml%252Fmodule.php%252Fcasserver%252Fcas.php%252Flogin%253Fservice%253Dhttps%25253A%25252F%25252Flogin.esc-web.lib.cbs.dk%25253A8443%25252Flogin%25253Fqurl%25253Dezp.2aHR0cHM6Ly96ZXBoeXIuYnZkaW5mby5jb20vaG9tZS5zZXJ2P3Byb2R1Y3Q9emVwaHlybmVvJmxvZ2luZnJvbWNvbnRleHQ9aXBhZGRyZXNz%26cookieTime%3D1586890197"
 
 #Open Chrome
-driver = webdriver.Chrome()
+driver = webdriver.Chrome('/Users/kazba1/Downloads/chromedriver')
 driver.get(url)
 driver.maximize_window()
-time.sleep(3)
 
 #Logg in using info in "username" and "password"
 driver.find_element_by_name("username").send_keys(username)
@@ -37,16 +35,10 @@ driver.find_element_by_id("ContentContainer1_ctl00_Content_VersionSelection1_GoZ
 
 #Open the dropdown menu by hovering and click the "All deals"-button that appears, then get list
 #Really struggled here
-element_to_hover_over = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl02_SearchSearchMenu_Menu1"]/li[4]/span')
+element_to_hover_over = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl02_SearchSearchMenu_Menu2"]/li[13]')
 hover = ActionChains(driver).move_to_element(element_to_hover_over)
 hover.perform()
-listed_unlisted_delisted_button = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl02_SearchSearchMenu_Menu1"]/li[4]/ul/li[2]/span').click()
-#click the "Listed" and "Unlisted" boxes
-driver.find_element_by_xpath('//*[@id="MasterContent_ctl00_Content_ListedUnlistedCtl_CheckBoxListControlForAcquiror_Input_Quoted"]').click()
-driver.find_element_by_xpath('//*[@id="MasterContent_ctl00_Content_ListedUnlistedCtl_CheckBoxListControlForAcquiror_Input_DeListed"]').click()
-#click ok
-driver.find_element_by_xpath('//*[@id="MasterContent_ctl00_Content_Ok"]').click()
-#search list
+all_deals_button = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl02_SearchSearchMenu_Menu2"]/li[13]/ul/li[1]').click()
 driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl05_GoToList"]').click()
 
 #edit search options
@@ -79,22 +71,10 @@ driver.find_element_by_xpath('//*[@id="TreeView1#GROUPDEALOVERVIEW"]/a').click()
 #deal structure and dates
 driver.find_element_by_xpath('//*[@id="TreeView1#GROUPDEALSTRUCTANDDATES"]/a').click()
 driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_STRUCTURE_AND_DATES.COMPLETION_DATE*U"]/a/span').click()
-#click "company"
-driver.find_element_by_xpath('//*[@id="tab_Company"]').click()
-time.sleep(5)
-driver.find_element_by_xpath('//*[@id="GROUPCOMPANYFINANCIAL_NodeImg"]').click()
-driver.find_element_by_xpath('//*[@id="COMPANY_FINANCIAL_ITEM*COMPANY_FINANCIAL_ITEM.TITLE02*U_NodeImg"]').click()
-
-driver.find_element_by_xpath('//*[@id="TreeView1#COMPANY_FINANCIAL_ITEM.BDNETPROFIT*U"]/img').click()
-driver.switch_to_frame(driver.find_element_by_xpath('//*[@id="frameFormatOptionDialog"]'))
-time.sleep(3)
-driver.find_element_by_xpath('//*[@id="ctl00_OptionFooterSubView_OkButton"]').click()
-
-driver.find_element_by_xpath('//*[@id="TreeView1#COMPANY_FINANCIAL_ITEM.BDDLENVALUE*U"]/img').click()
-#driver.switch_to_frame(driver.find_element_by_xpath('//*[@id="frameFormatOptionDialog"]'))
-
 #ok
 driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_SaveFormat_OkButton"]').click()
+#driver.find_element_by_xpath().click()
+
 
 
 #Section 2: Define the functions
@@ -102,16 +82,13 @@ driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_SaveForma
 #the master list will be converted into a DataFrame at a later stage
 master_list = []
 
-#timer for meauring approximate time to scrape
-timer_start = time.time()
-
 #while on a deal page, this function changes the index page to the next one
 #change this to work on the list page
 def change_index_page3(page_index_we, new_page_index, master_list):
     page_index_we = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_CurrentPage"]')
     time.sleep(2)
     driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_NextPage"]').click()
-    time.sleep(3)
+    time.sleep(10)
     return scraper(master_list)
 
 # page_scraper(sub_list, master_list)
@@ -132,16 +109,15 @@ def scraper(master_list):
     pd_target_operating_revenue_var = "2"
     pd_target_EBITDA_var = "2"
     target_activity_var = "2"
-    acquiror_net_profit_var = "2"
-    acquiror_enterprise_value_var = "2"
 
     number_of_deals_on_page = 0
     table_element = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody')
     for tr in table_element.find_elements_by_tag_name("tr"):
         number_of_deals_on_page = number_of_deals_on_page + 1
-    number_of_deals_on_page = number_of_deals_on_page - 1
+    number_of_deals_on_page = number_of_deals_on_page - 2
 
     while list_row < number_of_deals_on_page:
+        #driver.execute_script("document.body.style.zoom='50%'")
         sub_list = []
         print(list_row)
 
@@ -217,19 +193,8 @@ def scraper(master_list):
         target_activity_var = str(copy.copy(target_activity_var2))
         sub_list.append(target_activity.text)
 
-        xpath_acquiror_net_profit = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + acquiror_net_profit_var + ']/td[25]'
-        acquiror_net_profit = driver.find_element_by_xpath(xpath_acquiror_net_profit)
-        acquiror_net_profit_var2 = int(acquiror_net_profit_var) + 1
-        acquiror_net_profit_var = str(copy.copy(acquiror_net_profit_var2))
-        sub_list.append(acquiror_net_profit.text)
-
-        xpath_acquiror_enterprise_value = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_VDTBL"]/tbody/tr[' + acquiror_enterprise_value_var + ']/td[27]'
-        acquiror_enterprise_value = driver.find_element_by_xpath(xpath_acquiror_enterprise_value)
-        acquiror_enterprise_value_var2 = int(acquiror_enterprise_value_var) + 1
-        acquiror_enterprise_value_var = str(copy.copy(acquiror_enterprise_value_var2))
-        sub_list.append(acquiror_enterprise_value.text)
-
         # acquired_stake = driver.find_element_by_xpath
+
         # target_enterprise_value = driver.find_element_by_xpath
         # target_business_desc = driver.find_element_by_xpath
         # target_trade_desc = driver.find_element_by_xpath
@@ -237,8 +202,6 @@ def scraper(master_list):
         # target_primary_business_desc = driver.find_element_by_xpath
 
         master_list.append(sub_list)
-        df_master_list = pd.DataFrame(master_list)
-        df_master_list.to_csv('C:/Users/edwar/Desktop/MasterList DataFrame Not Final.csv', index=False, sep=',')
         list_row = list_row + 1
 
     page_index_we = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_CurrentPage"]')
@@ -247,17 +210,13 @@ def scraper(master_list):
     new_page_index = int(page_index_copy) + 1
     number_of_pages = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_PagesLabel"]').text[-5:]
     #here "int(number_of_pages)" should be used
-    if int(page_index_value) < 2:
+    if int(page_index_value) < 200:
         change_index_page3(page_index_we, new_page_index, master_list)
     else: finish(master_list)
 
 def finish(master_list):
-    print(master_list)
     df_master_list = pd.DataFrame(master_list)
-    print(df_master_list)
-    timer_end = time.time()
-    print(timer_end - timer_start)
-    df_master_list.to_csv('C:/Users/edwar/Desktop/MasterList DataFrame Final.csv', index=False, sep=',')
+    df_master_list.to_csv(r'/Users/kazba1/Desktop/Reference-Class-Forecasting/Master_list_200.csv', index = False)
     print("Done")
 
 scraper(master_list)

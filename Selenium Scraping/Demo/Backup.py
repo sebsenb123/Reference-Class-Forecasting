@@ -41,41 +41,25 @@ hover.perform()
 all_deals_button = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl02_SearchSearchMenu_Menu2"]/li[13]/ul/li[1]').click()
 driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_QuickSearch1_ctl05_GoToList"]').click()
 
-#edit search options
-driver.find_element_by_xpath('//*[@id="divMoreColumnHeader"]/div/a[2]').click()
-#deal values
-driver.find_element_by_xpath('//*[@id="TreeView1#GROUPDEALVALUES"]/a').click()
-driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_VALUES.STAKE*U"]/img').click()
-time.sleep(3)
-driver.switch_to_frame(driver.find_element_by_xpath('//*[@id="frameFormatOptionDialog"]'))
-driver.find_element_by_xpath('//*[@id="ctl00_OptionSubViews_DEAL_VALUES-RepeatableGroupFieldOption_rdFirst"]')
-driver.find_element_by_xpath('//*[@id="ctl00_OptionFooterSubView_OkButton"]').click()
-driver.find_element_by_xpath('//*[@id="TreeView1#GROUPDEALVALUES"]/a').click()
-#deal financials
-driver.find_element_by_xpath('//*[@id="TreeView1#GROUPDEALFINANCIALS"]/a').click()
-driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_FINANCIALS*DEAL_FINANCIALS.TITLE01*U"]/a').click()
-driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_FINANCIALS*DEAL_FINANCIALS.TITLE02*U"]/a').click()
-driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_FINANCIALS*DEAL_FINANCIALS.TITLE04*U"]/a').click()
-driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_FINANCIALS.TGTURN*U"]/a/span').click()
-time.sleep(3)
-driver.switch_to_frame(driver.find_element_by_xpath('//*[@id="frameFormatOptionDialog"]'))
-driver.find_element_by_xpath('//*[@id="ctl00_OptionSubViews_TYearlyInterimFinancialSelection_ctl00_0"]')
-driver.find_element_by_xpath('//*[@id="ctl00_OptionSubViews_TYearlyInterimFinancialSelection_ctl00_0"]')
-driver.find_element_by_xpath('//*[@id="ctl00_OptionFooterSubView_OkButton"]').click()
-driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_FINANCIALS.TGEBITDA*U"]/a/span').click()
-driver.find_element_by_xpath('//*[@id="TreeView1#GROUPDEALFINANCIALS"]/a').click()
-#deal overview
-driver.find_element_by_xpath('//*[@id="TreeView1#GROUPDEALOVERVIEW"]/a').click()
-driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_OVERVIEW.TGBUSDES*U"]/a/span').click()
-driver.find_element_by_xpath('//*[@id="TreeView1#GROUPDEALOVERVIEW"]/a').click()
-#deal structure and dates
-driver.find_element_by_xpath('//*[@id="TreeView1#GROUPDEALSTRUCTANDDATES"]/a').click()
-driver.find_element_by_xpath('//*[@id="TreeView1#DEAL_STRUCTURE_AND_DATES.COMPLETION_DATE*U"]/a/span').click()
-#ok
-driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_SaveFormat_OkButton"]').click()
-#driver.find_element_by_xpath().click()
+number_of_deals_on_page = 0
+table_element = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody')
+for tr in table_element.find_elements_by_tag_name("tr"):
+    number_of_deals_on_page = number_of_deals_on_page + 1
+print(number_of_deals_on_page)
 
+number_of_pages = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_PagesLabel"]').text[-5:]
+print(number_of_pages)
 
+page_index_we = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_CurrentPage"]')
+time.sleep(2)
+driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_NextPage"]').click()
+time.sleep(10)
+
+number_of_deals_on_page = 0
+table_element = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody')
+for tr in table_element.find_elements_by_tag_name("tr"):
+    number_of_deals_on_page = number_of_deals_on_page + 1
+print(number_of_deals_on_page)
 
 #Section 2: Define the functions
 
@@ -84,12 +68,11 @@ master_list = []
 
 #while on a deal page, this function changes the index page to the next one
 #change this to work on the list page
-def change_index_page3(page_index_we, new_page_index, master_list):
-    page_index_we = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_CurrentPage"]')
-    time.sleep(2)
-    driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_NextPage"]').click()
-    time.sleep(3)
-    return scraper(master_list)
+def change_index_page3(page_index_we, new_page_index):
+    page_index_we.clear()
+    page_index_we.send_keys(new_page_index)
+    page_index_we.send_keys(Keys.ENTER)
+    return scraper()
 
 # page_scraper(sub_list, master_list)
 ##Takes a sub list and a master list. The sublist is cleared and then filled with variables which then is appended to the master list, containing all the deals.
@@ -110,15 +93,11 @@ def scraper(master_list):
     pd_target_EBITDA_var = "2"
     target_activity_var = "2"
 
-    number_of_deals_on_page = 0
-    table_element = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody')
-    for tr in table_element.find_elements_by_tag_name("tr"):
-        number_of_deals_on_page = number_of_deals_on_page + 1
-    number_of_deals_on_page = number_of_deals_on_page - 1
 
-    while list_row < number_of_deals_on_page:
+
+    while list_row < 25:
+        driver.execute_script("document.body.style.zoom='50%'")
         sub_list = []
-        print(list_row)
 
         xpath_deal_number = '//*[@id="ContentContainer1_ctl00_Content_ListCtrl1_LB1_FDTBL"]/tbody/tr[' + deal_number_var + ']/td[1]'
         deal_number = driver.find_element_by_xpath(xpath_deal_number)
@@ -207,18 +186,17 @@ def scraper(master_list):
     page_index_value = page_index_we.get_attribute("value")
     page_index_copy = int(copy.copy(page_index_value))
     new_page_index = int(page_index_copy) + 1
-    number_of_pages = driver.find_element_by_xpath('//*[@id="ContentContainer1_ctl00_Content_ListNavigation_PagesLabel"]').text[-5:]
-    #here "int(number_of_pages)" should be used
-    if int(page_index_value) < 5:
-        change_index_page3(page_index_we, new_page_index, master_list)
+    # 82222
+    if int(page_index_value) < 2:
+        change_index_page3(new_page_index)
     else: finish(master_list)
 
 def finish(master_list):
     print(master_list)
     df_master_list = pd.DataFrame(master_list)
-    df_master_list.to_csv('C:/Users/edwar/Desktop/MasterList DataFrame.csv', index=False, sep=',')
+    print(df_master_list)
     print("Done")
 
-scraper(master_list)
+
 
 time.sleep(30)
