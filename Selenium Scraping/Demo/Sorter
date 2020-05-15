@@ -1,0 +1,48 @@
+import pandas as pd
+import os
+import numpy as np
+data=pd.read_csv('/Users/kazba1/Downloads/Master-list-numeric.csv')
+df=pd.DataFrame(data)
+df=df.drop("Unnamed: 0", axis=1)
+df=df.replace(" ",np.nan)
+df=df[df['Target business description'].notnull()]
+df=df.reset_index(drop=True)
+
+keyword = input("Insert keyword (e.g. Energy, Energy distribution, Banking): ")
+Revenue_Turnover = input("input Revenue_Turnover of interest such as 10000000 or write n.a.: ")
+EBITDA = input("input EBITDA of interest such as 1000000 or write n.a.: ")
+Net_profit= input("input Net_profit of interest or write n.a.: ")
+Enterprise_value = input("input Enterprise_value of interest or write n.a.: ")
+
+#   In an example I used:
+#   keyword = "Energy"      
+#   Revenue_Turnover=10000000
+#   EBITDA=1000000
+#   Net_profit="n.a."
+#   Enterprise_value="n.a."
+
+keyword=keyword.split()
+df['Keyword']=0
+for j in range(len(keyword)):
+    df.loc[(df['Target business description'].str.contains(keyword[j])),'Keyword']+=1
+
+df['variable difference %']=0
+if Revenue_Turnover!="n.a.":
+    Revenue_Turnover=int(Revenue_Turnover)
+    df['variable difference %']+=((df['Pre-deal target operating revenue/turnover']-Revenue_Turnover)/Revenue_Turnover).abs()*100
+    df=df.dropna(subset=['Pre-deal target operating revenue/turnover'])
+if EBITDA!="n.a.":
+    EBITDA=int(EBITDA)
+    df['variable difference %']+=((df['Pre-deal target EBITDA']-EBITDA)/EBITDA).abs()*100
+    df=df.dropna(subset=['Pre-deal target EBITDA'])
+if Net_profit!="n.a.":
+    Net_profit=int(Net_profit)
+    df['variable difference %']+=((df['Net profit']-Net_profit)/Net_profit).abs()*100
+    df=df.dropna(subset=['Net profit'])
+if Enterprise_value!="n.a.":
+    Enterprise_value=int(Enterprise_value)
+    df['variable difference %']+=((df['Enterprise value']-Enterprise_value)/Enterprise_value).abs()*100
+    df=df.dropna(subset=['Enterprise value'])
+df=df.sort_values(by=['Keyword','variable difference %'],ascending=[False,True])
+df=df.reset_index(drop=True)
+print(df.head(30))
