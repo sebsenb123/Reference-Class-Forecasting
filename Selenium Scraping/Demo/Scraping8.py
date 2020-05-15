@@ -254,15 +254,10 @@ def scraper(master_list):
 def finish(master_list):
     print(master_list)
     df_master_list = pd.DataFrame(master_list)
-<<<<<<< HEAD:Selenium Scraping/Demo/Scraping8.py
     print(df_master_list)
     timer_end = time.time()
     print(timer_end - timer_start)
     df_master_list.to_csv('C:/Users/edwar/Desktop/MasterList DataFrame Final.csv', index=False, sep=',')
-=======
-
-    print(df_master_list)
->>>>>>> parent of 78cf413... Update Scraping.py:Selenium Scraping/Demo/Scraping.py
     print("Done")
 
 scraper(master_list)
