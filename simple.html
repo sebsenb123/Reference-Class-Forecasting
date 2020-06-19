@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Reference Class Forecasting in M&A</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/ble1.css') }}"
+    />
+  </head>
+  <body>
+    <div class="header">
+      <h2>Reference Class Forecasting in M&A</h2>
+    </div>
+    <form>
+        <img src='/do_box_1/' alt="Box Plot" height="342" width="500" class="center">
+    </form>
+    <form style="font-size:13px" >
+
+        <center>
+            {% for table in tables1 %}
+                {{ table|safe }}
+            {% endfor %}
+        </center>
+
+    </form>
+    <form style="font-size:11px">
+        {% for table in tables %}
+            {{ table|safe }}
+        {% endfor %}
+    </form>
+  </body>
+</html>

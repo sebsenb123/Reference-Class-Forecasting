@@ -1,1 +1,42 @@
-print('hello world')
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Reference Class Forecasting in M&A</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/intro3.css') }}"
+    />
+  </head>
+  <body>
+    <div class="header">
+      <h2>Reference Class Forecasting in M&A</h2>
+    </div>
+    <!-- Form -->
+    <div class="container">
+      <form action="{{url_for('result')}}" method="POST">
+        <div class="form-group">
+          <label for="keyword">Keyword:</label>
+          <input type="text" id=keyword placeholder="Input Keywords for target business description (e.g. Real estate, Energy distribution)" name="keyword" />
+        </div>
+        <div class="form-group">
+          <label for="Revenue_Turnover">Revenue/Turnover:</label>
+          <input type="text" id=Revenue_Turnover placeholder="Input target Operating Revenue/Turnover in th EUR or leave a blank" name="Revenue_Turnover" />
+        </div>
+        <div class="form-group">
+          <label for="EBITDA">EBITDA:</label>
+          <input type="text" id=EBITDA placeholder="Input target EBITDA in th EUR or leave a blank" name="EBITDA" />
+        </div>
+        <div class="form-group">
+          <label for="Net_profit">Net profit:</label>
+          <input type="text" id=Net_profit placeholder="Input target Net Profit in th EUR or leave a blank" name="Net_profit" />
+        </div>
+        <div class="form-group">
+          <label for="Enterprise_value">Enterprise value:</label>
+          <input type="text" id=Enterprise_value placeholder="Input Deal Enterprise Value in th EUR or leave a blank" name="Enterprise_value" />
+        </div>
+        <input type="submit" value="Submit" id="calc_btn" class="btn" />
+        <br />
+      </form>
+    </div>
+  </body>
+</html>
